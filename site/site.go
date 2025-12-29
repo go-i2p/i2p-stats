@@ -139,6 +139,7 @@ func (s StatsSite) GenerateNavSection() string {
 	lines += "<ul>\n"
 	lines += fmt.Sprintf("    <li><a href=\"%s\">%s</a></li>\n", "/", "homepage")
 	for _, subdir := range lsd {
+		log.Println("Adding subdir to nav:", subdir)
 		lines += fmt.Sprintf("    <li><a href=\"%s\">%s</a></li>\n", subdir, subdir)
 	}
 	lines += "</ul>"
