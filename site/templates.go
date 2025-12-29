@@ -43,7 +43,7 @@ func NewTemplateManager(templatesDir string) (*TemplateManager, error) {
 
 	// Load HTML templates
 	htmlDir := filepath.Join(templatesDir, "html")
-	htmlFiles := []string{"base.html", "index.html", "nav.html", "stat-detail.html", "subdir-index.html"}
+	htmlFiles := []string{"base.html", "nav.html", "subdir-index.html"}
 	for _, file := range htmlFiles {
 		path := filepath.Join(htmlDir, file)
 		tmpl, err := template.ParseFiles(path)
