@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/eyedeekay/i2p-stats/git"
-	"github.com/eyedeekay/i2p-stats/site"
-	"github.com/eyedeekay/i2p-stats/stats"
+	"github.com/go-i2p/i2p-stats/git"
+	"github.com/go-i2p/i2p-stats/site"
+	"github.com/go-i2p/i2p-stats/stats"
 )
 
 var Docroot = docroot

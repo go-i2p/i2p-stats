@@ -1,12 +1,13 @@
-module github.com/eyedeekay/i2p-stats
+module github.com/go-i2p/i2p-stats
 
-go 1.24.4
+go 1.25.4
 
 require (
-	github.com/eyedeekay/go-i2pcontrol v0.1.5
+	github.com/go-git/go-git/v5 v5.16.4
 	github.com/go-i2p/common v0.1.1-0.20251229104116-ea93370d9a19
+	github.com/go-i2p/go-i2pcontrol v0.1.7
 	github.com/go-i2p/logger v0.1.0
-	github.com/gomarkdown/markdown v0.0.0-20230322041520-c84983bdbf2a
+	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a
 	github.com/oschwald/geoip2-golang/v2 v2.1.0
 )
 
@@ -21,8 +22,7 @@ require (
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.6.2 // indirect
-	github.com/go-git/go-git/v5 v5.16.4 // indirect
-	github.com/go-i2p/crypto v0.1.0 // indirect
+	github.com/go-i2p/crypto v0.0.5 // indirect
 	github.com/go-i2p/elgamal v0.0.2 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
@@ -36,7 +36,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	github.com/ybbus/jsonrpc/v2 v2.1.6 // indirect
+	github.com/ybbus/jsonrpc/v2 v2.1.7 // indirect
 	go.opentelemetry.io/otel v1.39.0 // indirect
 	go.opentelemetry.io/otel/trace v1.39.0 // indirect
 	go.step.sm/crypto v0.75.0 // indirect

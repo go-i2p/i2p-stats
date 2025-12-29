@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/eyedeekay/go-i2pcontrol"
+	"github.com/go-i2p/go-i2pcontrol"
 
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"

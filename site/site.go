@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/eyedeekay/i2p-stats/stats"
+	"github.com/go-i2p/i2p-stats/stats"
 )
 
 var header = `<!DOCTYPE html>
