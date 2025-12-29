@@ -56,6 +56,8 @@ func (db *DHT) routerInfos() (routerInfos []router_info.RouterInfo, err error) {
 			lgr.WithError(err).WithField("path", path).Error("RouterInfo Parsing Error")
 			lgr.WithField("path", path).WithField("remainder", remainder).Debug("Leftover Data(for debugging)")
 			continue
+		} else {
+			lgr.WithField("path", path).Debug("Successfully parsed RouterInfo")
 		}
 
 		routerInfos = append(routerInfos, riStruct)
