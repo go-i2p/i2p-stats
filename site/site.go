@@ -137,7 +137,7 @@ func (s StatsSite) GenerateNavSection() string {
 	lines := "\n"
 	lines += `<div id="nav" class="navigation sitecomponent list">`
 	lines += "<ul>\n"
-	lines += fmt.Sprintf("    <li><a href=\"%s\">%s</a></li>\n", "/", "/")
+	lines += fmt.Sprintf("    <li><a href=\"%s\">%s</a></li>\n", "", "/")
 	for _, subdir := range lsd {
 		lines += fmt.Sprintf("    <li><a href=\"%s\">%s</a></li>\n", subdir, subdir)
 	}
