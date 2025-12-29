@@ -28,6 +28,7 @@ type StatsSite struct {
 	stats.Series
 	StatsDirectory  string
 	TemplateManager *TemplateManager
+	DHT             *stats.DHT
 }
 
 func (s *StatsSite) SeriesFile() string {
@@ -265,7 +266,7 @@ func (s StatsSite) GenerateMarkdownIndexPages() error {
 	return nil
 }
 
-func NewStatsSite(statsDirectory string, templateManager *TemplateManager) (StatsSite, error) {
+func NewStatsSite(statsDirectory string, templateManager *TemplateManager, dht *stats.DHT) (StatsSite, error) {
 	absStatsDirectory, err := filepath.Abs(statsDirectory)
 	if err != nil {
 		log.Printf("error getting absolute path: %v", err)
@@ -275,6 +276,7 @@ func NewStatsSite(statsDirectory string, templateManager *TemplateManager) (Stat
 	s := StatsSite{
 		StatsDirectory:  absStatsDirectory,
 		TemplateManager: templateManager,
+		DHT:             dht,
 		Series: stats.Series{
 			Stats: []stats.Stats{},
 		},
@@ -292,13 +294,13 @@ func NewStatsSite(statsDirectory string, templateManager *TemplateManager) (Stat
 			log.Printf("error loading stats series: %v", err)
 			return StatsSite{}, err
 		}
-		if err := s.UpdateSeries(); err != nil {
+		if err := s.UpdateSeries(dht); err != nil {
 			log.Printf("error updating stats series with new entry: %v", err)
 			return StatsSite{}, err
 		}
 	} else {
 		fmt.Println("series file does not exist, creating new series")
-		s.Series, err = stats.NewSeries()
+		s.Series, err = stats.NewSeries(dht)
 		if err != nil {
 			log.Printf("error creating new stats series: %v", err)
 			return StatsSite{}, err

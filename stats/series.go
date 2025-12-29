@@ -114,8 +114,8 @@ func (s Series) JSONString() (string, error) {
 	return string(b), nil
 }
 
-func (s *Series) UpdateSeries() error {
-	stats, err := NewStats()
+func (s *Series) UpdateSeries(dht *DHT) error {
+	stats, err := NewStats(dht)
 	if err != nil {
 		return err
 	}
@@ -123,8 +123,8 @@ func (s *Series) UpdateSeries() error {
 	return nil
 }
 
-func NewSeries() (Series, error) {
-	stats, err := NewStats()
+func NewSeries(dht *DHT) (Series, error) {
+	stats, err := NewStats(dht)
 	if err != nil {
 		return Series{}, err
 	}

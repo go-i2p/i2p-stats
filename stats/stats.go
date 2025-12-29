@@ -51,6 +51,14 @@ type Stats struct {
 	ExploratoryBuildRejectedPercent  int
 	ExploratoryBuildSucceededPercent int
 	ExploratoryBuildExpiredPercent   int
+	// DHT Statistics
+	TotalRouters     int
+	IPv4Routers      int
+	IPv6Routers      int
+	FloodfillRouters int
+	ReachableRouters int
+	NTCP2Routers     int
+	SSU2Routers      int
 }
 
 func ErrStat() Stats {
@@ -62,10 +70,17 @@ func ErrStat() Stats {
 		ExploratoryBuildRejectedPercent:  0,
 		ExploratoryBuildSucceededPercent: 0,
 		ExploratoryBuildExpiredPercent:   0,
+		TotalRouters:                     0,
+		IPv4Routers:                      0,
+		IPv6Routers:                      0,
+		FloodfillRouters:                 0,
+		ReachableRouters:                 0,
+		NTCP2Routers:                     0,
+		SSU2Routers:                      0,
 	}
 }
 
-func NewStats() (Stats, error) {
+func NewStats(dht *DHT) (Stats, error) {
 	i2pcontrol.Initialize("localhost", "7657", "jsonrpc")
 	_, err := i2pcontrol.Authenticate("itoopie")
 	if err != nil {
@@ -87,19 +102,42 @@ func NewStats() (Stats, error) {
 	ExploratoryBuildRejectedPercent := 0
 	ExploratoryBuildSucceededPercent := 0
 	ExploratoryBuildExpiredPercent := 0
+	// Better handling of zero data - set to -1 to indicate no data
 	if ExploratoryBuildTotal == 0 {
-		ExploratoryBuildTotal = 1
+		ExploratoryBuildRejectedPercent = -1
+		ExploratoryBuildSucceededPercent = -1
+		ExploratoryBuildExpiredPercent = -1
+	} else {
+		ExploratoryBuildRejectedPercent = percent(ExploratoryBuildRejected, ExploratoryBuildTotal)
+		ExploratoryBuildSucceededPercent = percent(ExploratoryBuildSucceeded, ExploratoryBuildTotal)
+		ExploratoryBuildExpiredPercent = percent(ExploratoryBuildExpired, ExploratoryBuildTotal)
 	}
 	log.Println("ExploratoryBuildTotal:", ExploratoryBuildTotal)
 	log.Println("ExploratoryBuildRejected:", ExploratoryBuildRejected)
 	log.Println("ExploratoryBuildSucceeded:", ExploratoryBuildSucceeded)
 	log.Println("ExploratoryBuildExpired:", ExploratoryBuildExpired)
-	ExploratoryBuildRejectedPercent = percent(ExploratoryBuildRejected, ExploratoryBuildTotal)
-	ExploratoryBuildSucceededPercent = percent(ExploratoryBuildSucceeded, ExploratoryBuildTotal)
-	ExploratoryBuildExpiredPercent = percent(ExploratoryBuildExpired, ExploratoryBuildTotal)
 	log.Println("ExploratoryBuildRejectedPercent:", ExploratoryBuildRejectedPercent)
 	log.Println("ExploratoryBuildSucceededPercent:", ExploratoryBuildSucceededPercent)
 	log.Println("ExploratoryBuildExpiredPercent:", ExploratoryBuildExpiredPercent)
+
+	// Collect DHT statistics if provided
+	var totalRouters, ipv4Routers, ipv6Routers, floodfillRouters, reachableRouters, ntcp2Routers, ssu2Routers int
+	if dht != nil {
+		totalRouters = dht.CountRouters()
+		ipv4Routers = dht.CountIPv4Routers()
+		ipv6Routers = dht.CountIPv6Routers()
+		floodfillRouters = dht.CountFloodfills()
+		reachableRouters = dht.CountReachableRouters()
+		ntcp2Routers = dht.CountNTCP2Routers()
+		ssu2Routers = dht.CountSSU2Routers()
+		log.Println("DHT Total Routers:", totalRouters)
+		log.Println("DHT IPv4 Routers:", ipv4Routers)
+		log.Println("DHT IPv6 Routers:", ipv6Routers)
+		log.Println("DHT Floodfill Routers:", floodfillRouters)
+		log.Println("DHT Reachable Routers:", reachableRouters)
+		log.Println("DHT NTCP2 Routers:", ntcp2Routers)
+		log.Println("DHT SSU2 Routers:", ssu2Routers)
+	}
 
 	return Stats{
 		CollectedDate:                    time.Now(),
@@ -109,6 +147,13 @@ func NewStats() (Stats, error) {
 		ExploratoryBuildRejectedPercent:  ExploratoryBuildRejectedPercent,
 		ExploratoryBuildSucceededPercent: ExploratoryBuildSucceededPercent,
 		ExploratoryBuildExpiredPercent:   ExploratoryBuildExpiredPercent,
+		TotalRouters:                     totalRouters,
+		IPv4Routers:                      ipv4Routers,
+		IPv6Routers:                      ipv6Routers,
+		FloodfillRouters:                 floodfillRouters,
+		ReachableRouters:                 reachableRouters,
+		NTCP2Routers:                     ntcp2Routers,
+		SSU2Routers:                      ssu2Routers,
 	}, nil
 }
 
@@ -136,14 +181,36 @@ func (s Stats) Markdown() string {
 	}
 
 	// Fallback to hardcoded template
-	return fmt.Sprintf("### Stats for: %s\n\n - Exploratory Build Success Percentage: %d\n - Exploratory Build Rejection Percentage: %d\n - Exploratory Build Expired Percentage: %d\n - Exploratory Build Success: %d\n - Exploratory Build Reject: %d\n - Exploratory Build Expired: %d\n",
+	successPct := fmt.Sprintf("%d", s.ExploratoryBuildSucceededPercent)
+	rejectPct := fmt.Sprintf("%d", s.ExploratoryBuildRejectedPercent)
+	expiredPct := fmt.Sprintf("%d", s.ExploratoryBuildExpiredPercent)
+	if s.ExploratoryBuildSucceededPercent == -1 {
+		successPct = "N/A"
+		rejectPct = "N/A"
+		expiredPct = "N/A"
+	}
+
+	markdown := fmt.Sprintf("### Stats for: %s\n\n#### Build Statistics\n\n - Exploratory Build Success Percentage: %s\n - Exploratory Build Rejection Percentage: %s\n - Exploratory Build Expired Percentage: %s\n - Exploratory Build Success: %d\n - Exploratory Build Reject: %d\n - Exploratory Build Expired: %d\n",
 		s.CollectedDate.String(),
-		s.ExploratoryBuildSucceededPercent,
-		s.ExploratoryBuildRejectedPercent,
-		s.ExploratoryBuildExpiredPercent,
+		successPct,
+		rejectPct,
+		expiredPct,
 		s.ExploratoryBuildSucceeded,
 		s.ExploratoryBuildRejected,
 		s.ExploratoryBuildExpired)
+
+	if s.TotalRouters > 0 {
+		markdown += fmt.Sprintf("\n#### DHT Network Statistics\n\n - Total Routers: %d\n - IPv4 Routers: %d\n - IPv6 Routers: %d\n - Floodfill Routers: %d\n - Reachable Routers: %d\n - NTCP2 Routers: %d\n - SSU2 Routers: %d\n",
+			s.TotalRouters,
+			s.IPv4Routers,
+			s.IPv6Routers,
+			s.FloodfillRouters,
+			s.ReachableRouters,
+			s.NTCP2Routers,
+			s.SSU2Routers)
+	}
+
+	return markdown
 }
 
 func (s Stats) HTMLBytes() []byte {

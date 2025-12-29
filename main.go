@@ -35,6 +35,8 @@ func docroot() string {
 var runDir = flag.String("dir", Docroot(), "directory to run from")
 var templatesDir = flag.String("templates", "./templates", "directory containing templates")
 var noGit = flag.Bool("no-git", false, "skip git operations")
+var dhtDir = flag.String("dht", "", "directory containing DHT RouterInfo files (e.g., ~/.i2p/netDb)")
+var geoipDB = flag.String("geoip", "", "path to MaxMind GeoIP2 database file")
 
 func main() {
 	flag.Parse()
@@ -49,7 +51,32 @@ func main() {
 	// Set template manager for stats package
 	stats.SetTemplateManager(templateManager)
 
-	if statsite, err := site.NewStatsSite(*runDir, templateManager); err != nil {
+	// Initialize DHT if directory provided
+	var dht *stats.DHT
+	if *dhtDir != "" {
+		log.Println("Initializing DHT analysis from:", *dhtDir)
+		d, err := stats.NewDHT(*dhtDir)
+		if err != nil {
+			log.Printf("Warning: DHT initialization failed: %v", err)
+		} else {
+			dht = &d
+		}
+	}
+
+	// Initialize GeoIP if database provided
+	var geoip *stats.GeoIP
+	if *geoipDB != "" {
+		log.Println("Initializing GeoIP from:", *geoipDB)
+		g, err := stats.NewGeoIP(*geoipDB)
+		if err != nil {
+			log.Printf("Warning: GeoIP initialization failed: %v", err)
+		} else {
+			geoip = g
+			defer geoip.Close()
+		}
+	}
+
+	if statsite, err := site.NewStatsSite(*runDir, templateManager, dht); err != nil {
 		log.Fatal(err)
 	} else {
 		if err := statsite.OutputPages(); err != nil {

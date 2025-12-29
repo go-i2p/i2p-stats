@@ -14,9 +14,14 @@ type GeoIP struct {
 	DB     *geoip2.Reader
 }
 
-func NewGeoIP(dbPath string) (GeoIP, error) {
-	return GeoIP{
+func NewGeoIP(dbPath string) (*GeoIP, error) {
+	db, err := geoip2.Open(dbPath)
+	if err != nil {
+		return nil, err
+	}
+	return &GeoIP{
 		DBPath: dbPath,
+		DB:     db,
 	}, nil
 }
 
@@ -58,4 +63,12 @@ func (g *GeoIP) Country(parsedIP netip.Addr) (string, error) {
 		plainCountry = country.Country.Names.English
 	}
 	return plainCountry, nil
+}
+
+// Close releases the GeoIP database resources
+func (g *GeoIP) Close() error {
+	if g.DB != nil {
+		return g.DB.Close()
+	}
+	return nil
 }
