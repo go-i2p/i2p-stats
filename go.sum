@@ -40,6 +40,8 @@ github.com/go-i2p/common v0.1.1-0.20251229104116-ea93370d9a19 h1:v1eWWLcQ5d0qoV3
 github.com/go-i2p/common v0.1.1-0.20251229104116-ea93370d9a19/go.mod h1:a/AqLxkpCke1GpVO5oT2zdij3frRrPqIJ6+ajCiTXvo=
 github.com/go-i2p/crypto v0.0.5 h1:i6EiQ4rKnNDDcACFfCkizgfMTwxFcMRj187w/VLiD9o=
 github.com/go-i2p/crypto v0.0.5/go.mod h1:uerqW6jReQkeNgXXMM3n55wZbKbnvuZrbsDaNL9oLjo=
+github.com/go-i2p/crypto v0.1.1-0.20251212210701-124dadb97cb7 h1:6Oyo+a059Gc5/DX+F6oqbRhEh9O9u07bvnoRf5Iltqs=
+github.com/go-i2p/crypto v0.1.1-0.20251212210701-124dadb97cb7/go.mod h1:ayAu3sQu062OHtDYZv2smjlARfBQLdQHT8EtMu30ehg=
 github.com/go-i2p/elgamal v0.0.2 h1:3x2MwXWH5KjFZ06YThjLjB2/7eM3f6BsmhudKXn+dnk=
 github.com/go-i2p/elgamal v0.0.2/go.mod h1:5L85gta1c07w3f4ZCy4z//Caq1zaiHbEB8jocfQKWxM=
 github.com/go-i2p/go-i2pcontrol v0.1.7 h1:00Fdx7QVWEqcLsoZJPjWQ5SEnVi8cbyMW+qrHvkr9Kk=
