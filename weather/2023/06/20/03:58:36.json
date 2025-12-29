@@ -1,9 +1,0 @@
-{
-  "CollectedDate": "2023-06-20T03:58:36.275145047-04:00",
-  "ExploratoryBuildRejected": 5820,
-  "ExploratoryBuildSucceeded": 3562,
-  "ExploratoryBuildExpired": 3562,
-  "ExploratoryBuildRejectedPercent": 44,
-  "ExploratoryBuildSucceededPercent": 27,
-  "ExploratoryBuildExpiredPercent": 27
-}
