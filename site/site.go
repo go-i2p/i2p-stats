@@ -26,7 +26,8 @@ var footer = `
 
 type StatsSite struct {
 	stats.Series
-	StatsDirectory string
+	StatsDirectory  string
+	TemplateManager *TemplateManager
 }
 
 func (s *StatsSite) SeriesFile() string {
@@ -116,6 +117,25 @@ func (s StatsSite) GenerateNavSection() string {
 	if lsd == nil || len(lsd) == 0 {
 		return ""
 	}
+
+	// Try using external template if available
+	if s.TemplateManager != nil && s.TemplateManager.IsEnabled() {
+		links := []NavLink{{URL: "/", Text: "/"}}
+		for _, subdir := range lsd {
+			links = append(links, NavLink{URL: subdir, Text: subdir})
+		}
+		type NavData struct {
+			Links []NavLink
+		}
+		rendered, err := s.TemplateManager.RenderHTML("nav", NavData{Links: links})
+		if err != nil {
+			log.Printf("Error rendering nav template: %v, falling back to hardcoded", err)
+		} else {
+			return rendered
+		}
+	}
+
+	// Fallback to hardcoded template
 	lines := "\n"
 	lines += `<div id="nav" class="navigation sitecomponent list">`
 	lines += "<ul>\n"
@@ -135,21 +155,55 @@ func (s StatsSite) GenerateIndexPages() error {
 		return nil
 	}
 	for _, subdir := range lsd {
-		lines := "\n"
-		lines += `<div id="nav" class="navigation sitecomponent list">`
-		lines += "<ul>\n"
-		lines += fmt.Sprintf("    <li><a href=\"%s\">%s</a></li>\n", "/", "/")
-		lines += s.sanitize(fmt.Sprintf("    <li><a href=\"/%s\">%s</a></li>\n", subdir, subdir))
 		files, err := ioutil.ReadDir(subdir)
 		if err != nil {
 			return err
 		}
-		for _, f := range files {
-			lines += fmt.Sprintf("    <li><a href=\"%s\">%s</a></li>\n", f.Name(), f.Name())
+
+		var page string
+
+		// Try using external template if available
+		if s.TemplateManager != nil && s.TemplateManager.IsEnabled() {
+			links := []NavLink{{URL: "/", Text: "/"}}
+			links = append(links, NavLink{URL: "/" + subdir, Text: subdir})
+			for _, f := range files {
+				links = append(links, NavLink{URL: f.Name(), Text: f.Name()})
+			}
+			type NavData struct {
+				Links []NavLink
+			}
+			rendered, err := s.TemplateManager.RenderHTML("subdir-index", NavData{Links: links})
+			if err != nil {
+				log.Printf("Error rendering subdir-index template: %v, falling back to hardcoded", err)
+			} else {
+				type PageData struct {
+					Nav     string
+					Content string
+				}
+				fullPage, err := s.TemplateManager.RenderHTML("base", PageData{Nav: "", Content: rendered})
+				if err != nil {
+					log.Printf("Error rendering base template: %v, falling back to hardcoded", err)
+				} else {
+					page = s.sanitize(fullPage)
+				}
+			}
 		}
-		lines += "</ul>"
-		lines += "</div>\n"
-		page := s.sanitize(header + lines + footer)
+
+		// Fallback to hardcoded template if template rendering failed
+		if page == "" {
+			lines := "\n"
+			lines += `<div id="nav" class="navigation sitecomponent list">`
+			lines += "<ul>\n"
+			lines += fmt.Sprintf("    <li><a href=\"%s\">%s</a></li>\n", "/", "/")
+			lines += s.sanitize(fmt.Sprintf("    <li><a href=\"/%s\">%s</a></li>\n", subdir, subdir))
+			for _, f := range files {
+				lines += fmt.Sprintf("    <li><a href=\"%s\">%s</a></li>\n", f.Name(), f.Name())
+			}
+			lines += "</ul>"
+			lines += "</div>\n"
+			page = s.sanitize(header + lines + footer)
+		}
+
 		index := filepath.Join(subdir, "index.html")
 		log.Println("Generating index:", index)
 		if err := os.WriteFile(index, []byte(page), 0o644); err != nil {
@@ -166,21 +220,42 @@ func (s StatsSite) GenerateMarkdownIndexPages() error {
 		return nil
 	}
 	for _, subdir := range lsd {
-		lines := "\n"
-		// lines += `<div id="nav" class="navigation sitecomponent list">`
-		// lines += "<ul>\n"
-		lines += fmt.Sprintf(" - [%s](%s)\n", "/", "/")
-		lines += s.sanitize(fmt.Sprintf(" - [%s](%s)\n", subdir, subdir))
 		files, err := ioutil.ReadDir(subdir)
 		if err != nil {
 			return err
 		}
-		for _, f := range files {
-			lines += fmt.Sprintf(" - [%s](%s)\n", f.Name(), f.Name())
+
+		var page string
+
+		// Try using external template if available
+		if s.TemplateManager != nil && s.TemplateManager.IsEnabled() {
+			links := []NavLink{{URL: "/", Text: "/"}}
+			links = append(links, NavLink{URL: subdir, Text: subdir})
+			for _, f := range files {
+				links = append(links, NavLink{URL: f.Name(), Text: f.Name()})
+			}
+			type NavData struct {
+				Links []NavLink
+			}
+			rendered, err := s.TemplateManager.RenderMarkdown("subdir-index", NavData{Links: links})
+			if err != nil {
+				log.Printf("Error rendering subdir-index markdown template: %v, falling back to hardcoded", err)
+			} else {
+				page = s.sanitize(rendered)
+			}
 		}
-		// lines += "</ul>"
-		// lines += "</div>\n"
-		page := s.sanitize(lines)
+
+		// Fallback to hardcoded template if template rendering failed
+		if page == "" {
+			lines := "\n"
+			lines += fmt.Sprintf(" - [%s](%s)\n", "/", "/")
+			lines += s.sanitize(fmt.Sprintf(" - [%s](%s)\n", subdir, subdir))
+			for _, f := range files {
+				lines += fmt.Sprintf(" - [%s](%s)\n", f.Name(), f.Name())
+			}
+			page = s.sanitize(lines)
+		}
+
 		index := filepath.Join(subdir, "README.md")
 		log.Println("Generating index:", index)
 		if err := os.WriteFile(index, []byte(page), 0o644); err != nil {
@@ -190,7 +265,7 @@ func (s StatsSite) GenerateMarkdownIndexPages() error {
 	return nil
 }
 
-func NewStatsSite(statsDirectory string) (StatsSite, error) {
+func NewStatsSite(statsDirectory string, templateManager *TemplateManager) (StatsSite, error) {
 	absStatsDirectory, err := filepath.Abs(statsDirectory)
 	if err != nil {
 		log.Printf("error getting absolute path: %v", err)
@@ -198,7 +273,8 @@ func NewStatsSite(statsDirectory string) (StatsSite, error) {
 	}
 
 	s := StatsSite{
-		StatsDirectory: absStatsDirectory,
+		StatsDirectory:  absStatsDirectory,
+		TemplateManager: templateManager,
 		Series: stats.Series{
 			Stats: []stats.Stats{},
 		},
@@ -244,7 +320,24 @@ func (s *StatsSite) Markdown() (string, error) {
 
 func (s *StatsSite) HTML() string {
 	body := s.Series.HTML()
-	return s.sanitize(header + s.GenerateNavSection() + body + footer)
+	nav := s.GenerateNavSection()
+
+	// Try using external template if available
+	if s.TemplateManager != nil && s.TemplateManager.IsEnabled() {
+		type PageData struct {
+			Nav     string
+			Content string
+		}
+		rendered, err := s.TemplateManager.RenderHTML("base", PageData{Nav: nav, Content: body})
+		if err != nil {
+			log.Printf("Error rendering base template: %v, falling back to hardcoded", err)
+		} else {
+			return s.sanitize(rendered)
+		}
+	}
+
+	// Fallback to hardcoded template
+	return s.sanitize(header + nav + body + footer)
 }
 
 func (s *StatsSite) sanitize(sanitizee string) string {

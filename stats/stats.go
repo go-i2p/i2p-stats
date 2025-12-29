@@ -29,6 +29,20 @@ var footer = `
 	</body>
 </html>`
 
+// Global template manager - will be set by main
+var templateManager TemplateManager
+
+// TemplateManager interface for stats package
+type TemplateManager interface {
+	IsEnabled() bool
+	RenderMarkdown(name string, data interface{}) (string, error)
+}
+
+// SetTemplateManager sets the global template manager
+func SetTemplateManager(tm TemplateManager) {
+	templateManager = tm
+}
+
 type Stats struct {
 	CollectedDate                    time.Time
 	ExploratoryBuildRejected         int
@@ -111,6 +125,17 @@ func (s Stats) JSONString() (string, error) {
 }
 
 func (s Stats) Markdown() string {
+	// Try using external template if available
+	if templateManager != nil && templateManager.IsEnabled() {
+		rendered, err := templateManager.RenderMarkdown("stat-detail", s)
+		if err != nil {
+			log.Printf("Error rendering template: %v, falling back to hardcoded", err)
+		} else {
+			return rendered
+		}
+	}
+
+	// Fallback to hardcoded template
 	return fmt.Sprintf("### Stats for: %s\n\n - Exploratory Build Success Percentage: %d\n - Exploratory Build Rejection Percentage: %d\n - Exploratory Build Expired Percentage: %d\n - Exploratory Build Success: %d\n - Exploratory Build Reject: %d\n - Exploratory Build Expired: %d\n",
 		s.CollectedDate.String(),
 		s.ExploratoryBuildSucceededPercent,

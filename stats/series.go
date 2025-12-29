@@ -45,6 +45,22 @@ func (s Series) SaveStats(seriesDir string) error {
 }
 
 func (s Series) Markdown() (string, error) {
+	// Try using external template if available
+	if templateManager != nil && templateManager.IsEnabled() {
+		// Create a struct with the series data and individual markdown strings
+		type SeriesData struct {
+			Stats []Stats
+		}
+		data := SeriesData{Stats: s.Stats}
+		rendered, err := templateManager.RenderMarkdown("index", data)
+		if err != nil {
+			log.Printf("Error rendering template: %v, falling back to hardcoded", err)
+		} else {
+			return rendered, nil
+		}
+	}
+
+	// Fallback to hardcoded template
 	final := `Exploratory Build Stats Log
 ---------------------------
 `

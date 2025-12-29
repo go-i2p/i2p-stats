@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/eyedeekay/i2p-stats/site"
+	"github.com/eyedeekay/i2p-stats/stats"
 )
 
 var Docroot = docroot
@@ -32,11 +33,22 @@ func docroot() string {
 // Return the docroot path.
 
 var runDir = flag.String("dir", Docroot(), "directory to run from")
+var templatesDir = flag.String("templates", "./templates", "directory containing templates")
 
 func main() {
 	flag.Parse()
 	os.Chdir(*runDir)
-	if statsite, err := site.NewStatsSite(*runDir); err != nil {
+
+	// Initialize template manager
+	templateManager, err := site.NewTemplateManager(*templatesDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Set template manager for stats package
+	stats.SetTemplateManager(templateManager)
+
+	if statsite, err := site.NewStatsSite(*runDir, templateManager); err != nil {
 		log.Fatal(err)
 	} else {
 		if err := statsite.OutputPages(); err != nil {
