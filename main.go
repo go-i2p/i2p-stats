@@ -4,9 +4,9 @@ import (
 	"flag"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 
+	"github.com/eyedeekay/i2p-stats/git"
 	"github.com/eyedeekay/i2p-stats/site"
 	"github.com/eyedeekay/i2p-stats/stats"
 )
@@ -34,6 +34,7 @@ func docroot() string {
 
 var runDir = flag.String("dir", Docroot(), "directory to run from")
 var templatesDir = flag.String("templates", "./templates", "directory containing templates")
+var noGit = flag.Bool("no-git", false, "skip git operations")
 
 func main() {
 	flag.Parse()
@@ -60,46 +61,8 @@ func main() {
 		if err := statsite.OutputHomePage(); err != nil {
 			log.Fatal(err)
 		}
-		if gitIsInstalled() {
-			if gitDirExists(*runDir) {
-				gitAddCmd := exec.Command("git", "add", statsite.StatsDirectory)
-				gitAddCmd.Stdout = os.Stdout
-				gitAddCmd.Stderr = os.Stderr
-				gitAddCmd.Run()
-			}
+		if !*noGit {
+			git.AddChanges(*runDir, statsite.StatsDirectory)
 		}
 	}
-}
-
-func appIsInstalled(app string) bool {
-	_, err := exec.LookPath(app)
-	if err != nil {
-		gopath := os.Getenv("GOPATH")
-		if gopath != "" {
-			binPath := filepath.Join(gopath, "bin", app)
-			_, err = os.Stat(binPath)
-			if err == nil {
-				log.Println("found", binPath)
-				return true
-			}
-		}
-		return false
-	}
-	log.Println("found", app)
-	return true
-}
-
-func gitIsInstalled() bool {
-	return appIsInstalled("git")
-}
-
-func gitDirExists(statsDir string) bool {
-	log.Println("checking if", filepath.Join(statsDir, ".git"), "is a git directory")
-	_, err := os.Stat(filepath.Join(statsDir, ".git"))
-	if err == nil {
-		log.Println("git dir exists")
-	} else {
-		log.Println("git dir does not exist")
-	}
-	return err == nil
 }
