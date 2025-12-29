@@ -151,7 +151,7 @@ func (s StatsSite) GenerateNavSection() string {
 func (s StatsSite) GenerateIndexPages() error {
 	log.Println("Generating indices")
 	lsd := s.listSubdirsWithFiles()
-	if lsd == nil || len(lsd) == 0 {
+	if lsd == nil {
 		return nil
 	}
 	for _, subdir := range lsd {
