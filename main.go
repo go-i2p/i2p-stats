@@ -26,6 +26,16 @@ func docroot() string {
 	return weather
 }
 
+func netdbroot() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+	i2p := filepath.Join(home, ".i2p")
+	netdb := filepath.Join(i2p, "netDb")
+	return netdb
+}
+
 // Get the user's home directory.
 // Build the path to the i2p directory inside the home directory.
 // Build the path to the eepsite directory inside the i2p directory.
