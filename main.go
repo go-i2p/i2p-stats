@@ -42,11 +42,13 @@ func netdbroot() string {
 // Build the path to the docroot directory inside the eepsite directory.
 // Return the docroot path.
 
-var runDir = flag.String("dir", Docroot(), "directory to run from")
-var templatesDir = flag.String("templates", "./templates", "directory containing templates")
-var noGit = flag.Bool("no-git", false, "skip git operations")
-var dhtDir = flag.String("dht", "", "directory containing DHT RouterInfo files (e.g., ~/.i2p/netDb)")
-var geoipDB = flag.String("geoip", "", "path to MaxMind GeoIP2 database file")
+var (
+	runDir       = flag.String("dir", Docroot(), "directory to run from")
+	templatesDir = flag.String("templates", "./templates", "directory containing templates")
+	noGit        = flag.Bool("no-git", false, "skip git operations")
+	dhtDir       = flag.String("dht", "", "directory containing DHT RouterInfo files (e.g., ~/.i2p/netDb)")
+	geoipDB      = flag.String("geoip", "", "path to MaxMind GeoIP2 database file")
+)
 
 func main() {
 	flag.Parse()
