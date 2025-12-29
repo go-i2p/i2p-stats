@@ -2,14 +2,16 @@ package main
 
 import (
 	"flag"
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/go-i2p/i2p-stats/git"
 	"github.com/go-i2p/i2p-stats/site"
 	"github.com/go-i2p/i2p-stats/stats"
+	"github.com/go-i2p/logger"
 )
+
+var log = logger.GetGoI2PLogger()
 
 var Docroot = docroot
 
@@ -18,7 +20,7 @@ func docroot() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	i2p := filepath.Join(home, "i2p")
+	i2p := filepath.Join(home, ".i2p")
 	eepsite := filepath.Join(i2p, "eepsite")
 	docroot := filepath.Join(eepsite, "docroot")
 	weather := filepath.Join(docroot, "weather")
