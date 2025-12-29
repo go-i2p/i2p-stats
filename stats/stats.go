@@ -64,7 +64,7 @@ func NewStats() (Stats, error) {
 	if err != nil {
 		return ErrStat(), err
 	}
-	ExploratoryBuildExpired, err := i2pcontrol.ExploratoryBuildSuccess()
+	ExploratoryBuildExpired, err := i2pcontrol.ExploratoryBuildExpire()
 	if err != nil {
 		return ErrStat(), err
 	}
