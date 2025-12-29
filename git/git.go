@@ -42,5 +42,40 @@ func AddChanges(repoPath, pattern string) error {
 	}
 
 	log.Println("Successfully staged", pattern, "in git")
+
+	// Commit the staged changes
+	if err := CommitChanges(repoPath, "Automated stats update"); err != nil {
+		log.Println("Failed to commit changes:", err)
+		return nil
+	}
+
+	return nil
+}
+
+// CommitChanges creates a commit with the staged files in the git repository.
+// If the repository doesn't exist or git operations fail, it logs and returns nil.
+func CommitChanges(repoPath, message string) error {
+	// Open the repository
+	repo, err := git.PlainOpen(repoPath)
+	if err != nil {
+		log.Println("Failed to open git repository:", err)
+		return nil
+	}
+
+	// Get the worktree
+	worktree, err := repo.Worktree()
+	if err != nil {
+		log.Println("Failed to get worktree:", err)
+		return nil
+	}
+
+	// Commit the staged changes
+	commit, err := worktree.Commit(message, &git.CommitOptions{})
+	if err != nil {
+		log.Println("Failed to commit:", err)
+		return nil
+	}
+
+	log.Println("Successfully committed changes:", commit.String())
 	return nil
 }

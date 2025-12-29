@@ -45,7 +45,8 @@ func main() {
 	// Initialize template manager
 	templateManager, err := site.NewTemplateManager(*templatesDir)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Warning: Template initialization failed: %v. Falling back to hardcoded templates.", err)
+		templateManager = site.NewDisabledTemplateManager()
 	}
 
 	// Set template manager for stats package
@@ -79,6 +80,7 @@ func main() {
 	if statsite, err := site.NewStatsSite(*runDir, templateManager, dht); err != nil {
 		log.Fatal(err)
 	} else {
+		// Generate HTML output
 		if err := statsite.OutputPages(); err != nil {
 			log.Fatal(err)
 		}
@@ -86,6 +88,16 @@ func main() {
 			log.Fatal(err)
 		}
 		if err := statsite.OutputHomePage(); err != nil {
+			log.Fatal(err)
+		}
+		// Generate Markdown output
+		if err := statsite.OutputMarkdownPages(); err != nil {
+			log.Fatal(err)
+		}
+		if err := statsite.OutputMarkdownHomePage(); err != nil {
+			log.Fatal(err)
+		}
+		if err := statsite.GenerateMarkdownIndexPages(); err != nil {
 			log.Fatal(err)
 		}
 		if !*noGit {

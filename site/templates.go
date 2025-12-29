@@ -72,6 +72,17 @@ func NewTemplateManager(templatesDir string) (*TemplateManager, error) {
 	return tm, nil
 }
 
+// NewDisabledTemplateManager creates a template manager with templates disabled
+// Used as fallback when template loading fails
+func NewDisabledTemplateManager() *TemplateManager {
+	return &TemplateManager{
+		htmlTemplates:     make(map[string]*template.Template),
+		markdownTemplates: make(map[string]*texttemplate.Template),
+		templatesDir:      "",
+		enabled:           false,
+	}
+}
+
 // IsEnabled returns true if external templates are loaded
 func (tm *TemplateManager) IsEnabled() bool {
 	return tm.enabled

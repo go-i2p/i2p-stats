@@ -1,0 +1,28 @@
+<div class="stats single measurement" id="{{.CollectedDate}}">
+<h3>Stats for: {{.CollectedDate}}</h3>
+<h4>Build Statistics</h4>
+<ul>
+<li>Exploratory Build Success Percentage: {{.ExploratoryBuildSucceededPercent}}</li>
+<li>Exploratory Build Rejection Percentage: {{.ExploratoryBuildRejectedPercent}}</li>
+<li>Exploratory Build Expired Percentage: {{.ExploratoryBuildExpiredPercent}}</li>
+<li>Exploratory Build Success: {{.ExploratoryBuildSucceeded}}</li>
+<li>Exploratory Build Reject: {{.ExploratoryBuildRejected}}</li>
+<li>Exploratory Build Expired: {{.ExploratoryBuildExpired}}</li>
+</ul>
+{{if .DHTEnabled}}
+<h4>DHT Network Statistics</h4>
+{{if gt .TotalRouters 0}}
+<ul>
+<li>Total Routers: {{.TotalRouters}}</li>
+<li>IPv4 Routers: {{.IPv4Routers}}</li>
+<li>IPv6 Routers: {{.IPv6Routers}}</li>
+<li>Floodfill Routers: {{.FloodfillRouters}}</li>
+<li>Reachable Routers: {{.ReachableRouters}}</li>
+<li>NTCP2 Routers: {{.NTCP2Routers}}</li>
+<li>SSU2 Routers: {{.SSU2Routers}}</li>
+</ul>
+{{else}}
+<p>DHT collection enabled but no routers found in netDb</p>
+{{end}}
+{{end}}
+</div>

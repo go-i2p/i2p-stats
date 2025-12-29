@@ -52,6 +52,7 @@ type Stats struct {
 	ExploratoryBuildSucceededPercent int
 	ExploratoryBuildExpiredPercent   int
 	// DHT Statistics
+	DHTEnabled       bool
 	TotalRouters     int
 	IPv4Routers      int
 	IPv6Routers      int
@@ -70,6 +71,7 @@ func ErrStat() Stats {
 		ExploratoryBuildRejectedPercent:  0,
 		ExploratoryBuildSucceededPercent: 0,
 		ExploratoryBuildExpiredPercent:   0,
+		DHTEnabled:                       false,
 		TotalRouters:                     0,
 		IPv4Routers:                      0,
 		IPv6Routers:                      0,
@@ -122,7 +124,9 @@ func NewStats(dht *DHT) (Stats, error) {
 
 	// Collect DHT statistics if provided
 	var totalRouters, ipv4Routers, ipv6Routers, floodfillRouters, reachableRouters, ntcp2Routers, ssu2Routers int
+	dhtEnabled := false
 	if dht != nil {
+		dhtEnabled = true
 		totalRouters = dht.CountRouters()
 		ipv4Routers = dht.CountIPv4Routers()
 		ipv6Routers = dht.CountIPv6Routers()
@@ -147,6 +151,7 @@ func NewStats(dht *DHT) (Stats, error) {
 		ExploratoryBuildRejectedPercent:  ExploratoryBuildRejectedPercent,
 		ExploratoryBuildSucceededPercent: ExploratoryBuildSucceededPercent,
 		ExploratoryBuildExpiredPercent:   ExploratoryBuildExpiredPercent,
+		DHTEnabled:                       dhtEnabled,
 		TotalRouters:                     totalRouters,
 		IPv4Routers:                      ipv4Routers,
 		IPv6Routers:                      ipv6Routers,
@@ -158,6 +163,9 @@ func NewStats(dht *DHT) (Stats, error) {
 }
 
 func percent(explSuccess, explTotal int) int {
+	if explTotal == 0 {
+		return 0
+	}
 	return int(float64(explSuccess) / float64(explTotal) * 100)
 }
 
@@ -199,15 +207,19 @@ func (s Stats) Markdown() string {
 		s.ExploratoryBuildRejected,
 		s.ExploratoryBuildExpired)
 
-	if s.TotalRouters > 0 {
-		markdown += fmt.Sprintf("\n#### DHT Network Statistics\n\n - Total Routers: %d\n - IPv4 Routers: %d\n - IPv6 Routers: %d\n - Floodfill Routers: %d\n - Reachable Routers: %d\n - NTCP2 Routers: %d\n - SSU2 Routers: %d\n",
-			s.TotalRouters,
-			s.IPv4Routers,
-			s.IPv6Routers,
-			s.FloodfillRouters,
-			s.ReachableRouters,
-			s.NTCP2Routers,
-			s.SSU2Routers)
+	if s.DHTEnabled {
+		if s.TotalRouters > 0 {
+			markdown += fmt.Sprintf("\n#### DHT Network Statistics\n\n - Total Routers: %d\n - IPv4 Routers: %d\n - IPv6 Routers: %d\n - Floodfill Routers: %d\n - Reachable Routers: %d\n - NTCP2 Routers: %d\n - SSU2 Routers: %d\n",
+				s.TotalRouters,
+				s.IPv4Routers,
+				s.IPv6Routers,
+				s.FloodfillRouters,
+				s.ReachableRouters,
+				s.NTCP2Routers,
+				s.SSU2Routers)
+		} else {
+			markdown += "\n#### DHT Network Statistics\n\n - DHT collection enabled but no routers found in netDb\n"
+		}
 	}
 
 	return markdown
@@ -290,7 +302,7 @@ func (s Stats) SaveMarkdown(jsonDir string) error {
 	}
 	p := filepath.Join(fsp...) + ".md"
 	log.Println("  p", p)
-	return os.WriteFile(p, []byte(header+statBytes+footer), 0o644)
+	return os.WriteFile(p, []byte(statBytes), 0o644)
 }
 
 func LoadStats(jsonStr string) (Stats, error) {

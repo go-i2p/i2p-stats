@@ -85,14 +85,9 @@ func (s *StatsSite) listSubdirsWithFiles() []string {
 			if info.IsDir() {
 				htmlFiles, _ := filepath.Glob(filepath.Join(path, "*.html"))
 				jsonFiles, _ := filepath.Glob(filepath.Join(path, "*.json"))
+				// Include directories that have both HTML and JSON files
+				// Don't exclude directories just because they have index.html
 				if len(htmlFiles) > 0 && len(jsonFiles) > 0 {
-					if len(htmlFiles) == 1 {
-						for _, hfile := range htmlFiles {
-							if hfile == "index.html" {
-								return nil
-							}
-						}
-					}
 					subdirs[path] = path
 				}
 			}
