@@ -44,7 +44,7 @@ func (db *DHT) routerInfos() (routerInfos []router_info.RouterInfo, err error) {
 
 	filepath.Walk(db.Path, walkpath)
 
-	for path, _ := range files {
+	for path := range files {
 		riBytes, err := os.ReadFile(path)
 		if nil != err {
 			lgr.WithError(err).WithField("path", path).Error("Error reading RouterInfo file")
