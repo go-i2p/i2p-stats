@@ -121,11 +121,11 @@ func (s Stats) Markdown() string {
 		s.ExploratoryBuildExpired)
 }
 
-func (s Stats) mdToHTML(md []byte) []byte {
+func (s Stats) HTMLBytes() []byte {
 	// create markdown parser with extensions
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
 	p := parser.NewWithExtensions(extensions)
-	doc := p.Parse(md)
+	doc := p.Parse([]byte(s.Markdown()))
 
 	// create HTML renderer with extensions
 	htmlFlags := html.CommonFlags | html.HrefTargetBlank
@@ -138,11 +138,6 @@ func (s Stats) mdToHTML(md []byte) []byte {
 	final := append(prefix, rendered...)
 	final = append(final, suffix...)
 	return final
-}
-
-func (s Stats) HTMLBytes() []byte {
-	md := s.Markdown()
-	return s.mdToHTML([]byte(md))
 }
 
 func (s Stats) HTML() string {

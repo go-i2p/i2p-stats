@@ -39,33 +39,14 @@ func main() {
 	if statsite, err := site.NewStatsSite(*runDir); err != nil {
 		log.Fatal(err)
 	} else {
-		if edgarIsInstalled() {
-			if err := statsite.OutputMarkdownPages(); err != nil {
-				log.Fatal(err)
-			}
-			if err := statsite.GenerateMarkdownIndexPages(); err != nil {
-				log.Fatal(err)
-			}
-			if err := statsite.OutputMarkdownHomePage(); err != nil {
-				log.Fatal(err)
-			}
-
-			cmd := exec.Command("edgar", flag.Args()...)
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			cmd.Env = append(os.Environ(), "EDGAR_RECURSIVE=true")
-			// cmd.Dir = statsite.StatsDirectory
-			cmd.Run()
-		} else {
-			if err := statsite.OutputPages(); err != nil {
-				log.Fatal(err)
-			}
-			if err := statsite.GenerateIndexPages(); err != nil {
-				log.Fatal(err)
-			}
-			if err := statsite.OutputHomePage(); err != nil {
-				log.Fatal(err)
-			}
+		if err := statsite.OutputPages(); err != nil {
+			log.Fatal(err)
+		}
+		if err := statsite.GenerateIndexPages(); err != nil {
+			log.Fatal(err)
+		}
+		if err := statsite.OutputHomePage(); err != nil {
+			log.Fatal(err)
 		}
 		if gitIsInstalled() {
 			if gitDirExists(*runDir) {
@@ -94,10 +75,6 @@ func appIsInstalled(app string) bool {
 	}
 	log.Println("found", app)
 	return true
-}
-
-func edgarIsInstalled() bool {
-	return appIsInstalled("edgar")
 }
 
 func gitIsInstalled() bool {
