@@ -46,7 +46,7 @@ var (
 	runDir       = flag.String("dir", Docroot(), "directory to run from")
 	templatesDir = flag.String("templates", "./templates", "directory containing templates")
 	noGit        = flag.Bool("no-git", false, "skip git operations")
-	dhtDir       = flag.String("dht", "", "directory containing DHT RouterInfo files (e.g., ~/.i2p/netDb)")
+	dhtDir       = flag.String("dht", netdbroot(), "directory containing DHT RouterInfo files (e.g., ~/.i2p/netDb)")
 	geoipDB      = flag.String("geoip", "", "path to MaxMind GeoIP2 database file")
 )
 
