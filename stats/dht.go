@@ -61,7 +61,7 @@ func (db *DHT) routerInfos() (routerInfos []router_info.RouterInfo, err error) {
 		routerInfos = append(routerInfos, riStruct)
 	}
 
-	return
+	return routerInfos, err
 }
 
 func (db *DHT) CountRouters() int {

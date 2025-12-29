@@ -21,7 +21,7 @@ func docroot() string {
 	eepsite := filepath.Join(i2p, "eepsite")
 	docroot := filepath.Join(eepsite, "docroot")
 	weather := filepath.Join(docroot, "weather")
-	os.MkdirAll(weather, 0755)
+	os.MkdirAll(weather, 0o755)
 	return weather
 }
 
@@ -54,7 +54,7 @@ func main() {
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			cmd.Env = append(os.Environ(), "EDGAR_RECURSIVE=true")
-			//cmd.Dir = statsite.StatsDirectory
+			// cmd.Dir = statsite.StatsDirectory
 			cmd.Run()
 		} else {
 			if err := statsite.OutputPages(); err != nil {

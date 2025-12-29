@@ -24,6 +24,7 @@ var header = `<!DOCTYPE html>
 	</head>
 	<body>
 `
+
 var footer = `
 	</body>
 </html>`
@@ -137,7 +138,6 @@ func (s Stats) mdToHTML(md []byte) []byte {
 	final := append(prefix, rendered...)
 	final = append(final, suffix...)
 	return final
-
 }
 
 func (s Stats) HTMLBytes() []byte {
@@ -166,12 +166,12 @@ func (s Stats) SaveStat(jsonDir string) error {
 	fsp = append(fsp, fspb...)
 	fsd := filepath.Dir(filepath.Join(fsp...))
 	log.Println("fsd", fsd)
-	if err := os.MkdirAll(fsd, 0755); err != nil {
+	if err := os.MkdirAll(fsd, 0o755); err != nil {
 		return err
 	}
 	p := filepath.Join(fsp...) + ".json"
 	log.Println("  p", p)
-	return os.WriteFile(p, jsonBytes, 0644)
+	return os.WriteFile(p, jsonBytes, 0o644)
 }
 
 func (s Stats) SaveHTML(jsonDir string) error {
@@ -182,12 +182,12 @@ func (s Stats) SaveHTML(jsonDir string) error {
 	fsp = append(fsp, fspb...)
 	fsd := filepath.Dir(filepath.Join(fsp...))
 	log.Println("fsd", fsd)
-	if err := os.MkdirAll(fsd, 0755); err != nil {
+	if err := os.MkdirAll(fsd, 0o755); err != nil {
 		return err
 	}
 	p := filepath.Join(fsp...) + ".html"
 	log.Println("  p", p)
-	return os.WriteFile(p, []byte(header+statBytes+footer), 0644)
+	return os.WriteFile(p, []byte(header+statBytes+footer), 0o644)
 }
 
 func (s Stats) SaveMarkdown(jsonDir string) error {
@@ -198,12 +198,12 @@ func (s Stats) SaveMarkdown(jsonDir string) error {
 	fsp = append(fsp, fspb...)
 	fsd := filepath.Dir(filepath.Join(fsp...))
 	log.Println("fsd", fsd)
-	if err := os.MkdirAll(fsd, 0755); err != nil {
+	if err := os.MkdirAll(fsd, 0o755); err != nil {
 		return err
 	}
 	p := filepath.Join(fsp...) + ".md"
 	log.Println("  p", p)
-	return os.WriteFile(p, []byte(header+statBytes+footer), 0644)
+	return os.WriteFile(p, []byte(header+statBytes+footer), 0o644)
 }
 
 func LoadStats(jsonStr string) (Stats, error) {

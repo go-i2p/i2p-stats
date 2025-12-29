@@ -23,14 +23,14 @@ func (s Series) JSONBytes() ([]byte, error) {
 func (s Series) SaveSeries(seriesFile string) error {
 	log.Println("saving stats as whole series")
 	dir := filepath.Dir(seriesFile)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}
 	mjson, err := s.JSONBytes()
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(seriesFile, mjson, 0644)
+	return os.WriteFile(seriesFile, mjson, 0o644)
 }
 
 func (s Series) SaveStats(seriesDir string) error {

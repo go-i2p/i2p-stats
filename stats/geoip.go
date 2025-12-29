@@ -9,7 +9,6 @@ import (
 
 // Simple GeoIP lookup tool using a local MaxMind DB.
 // Used to determine router locations from IP addresses in RouterInfo entries.
-
 type GeoIP struct {
 	DBPath string
 	DB     *geoip2.Reader

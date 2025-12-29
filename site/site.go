@@ -19,6 +19,7 @@ var header = `<!DOCTYPE html>
 	</head>
 	<body>
 `
+
 var footer = `
 	</body>
 </html>`
@@ -38,7 +39,7 @@ func (s *StatsSite) OutputHomePage() error {
 	index := filepath.Join(s.StatsDirectory, "index.html")
 	htmlBytes := s.HTML()
 	log.Println("Generating index:", index)
-	return os.WriteFile(index, []byte(htmlBytes), 0644)
+	return os.WriteFile(index, []byte(htmlBytes), 0o644)
 }
 
 func (s *StatsSite) OutputMarkdownHomePage() error {
@@ -48,7 +49,7 @@ func (s *StatsSite) OutputMarkdownHomePage() error {
 		return err
 	}
 	log.Println("Generating index:", index)
-	return os.WriteFile(index, []byte(htmlBytes), 0644)
+	return os.WriteFile(index, []byte(htmlBytes), 0o644)
 }
 
 func (s *StatsSite) OutputPages() error {
@@ -151,7 +152,7 @@ func (s StatsSite) GenerateIndexPages() error {
 		page := s.sanitize(header + lines + footer)
 		index := filepath.Join(subdir, "index.html")
 		log.Println("Generating index:", index)
-		if err := os.WriteFile(index, []byte(page), 0644); err != nil {
+		if err := os.WriteFile(index, []byte(page), 0o644); err != nil {
 			return err
 		}
 	}
@@ -166,8 +167,8 @@ func (s StatsSite) GenerateMarkdownIndexPages() error {
 	}
 	for _, subdir := range lsd {
 		lines := "\n"
-		//lines += `<div id="nav" class="navigation sitecomponent list">`
-		//lines += "<ul>\n"
+		// lines += `<div id="nav" class="navigation sitecomponent list">`
+		// lines += "<ul>\n"
 		lines += fmt.Sprintf(" - [%s](%s)\n", "/", "/")
 		lines += s.sanitize(fmt.Sprintf(" - [%s](%s)\n", subdir, subdir))
 		files, err := ioutil.ReadDir(subdir)
@@ -177,12 +178,12 @@ func (s StatsSite) GenerateMarkdownIndexPages() error {
 		for _, f := range files {
 			lines += fmt.Sprintf(" - [%s](%s)\n", f.Name(), f.Name())
 		}
-		//lines += "</ul>"
-		//lines += "</div>\n"
+		// lines += "</ul>"
+		// lines += "</div>\n"
 		page := s.sanitize(lines)
 		index := filepath.Join(subdir, "README.md")
 		log.Println("Generating index:", index)
-		if err := os.WriteFile(index, []byte(page), 0644); err != nil {
+		if err := os.WriteFile(index, []byte(page), 0o644); err != nil {
 			return err
 		}
 	}
@@ -203,7 +204,7 @@ func NewStatsSite(statsDirectory string) (StatsSite, error) {
 		},
 	}
 
-	err = os.MkdirAll(s.StatsDirectory, 0755)
+	err = os.MkdirAll(s.StatsDirectory, 0o755)
 	if err != nil {
 		log.Printf("error creating stats directory: %v", err)
 		return StatsSite{}, err
