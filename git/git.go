@@ -1,12 +1,14 @@
 package git
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-i2p/logger"
 )
+
+var log = logger.GetGoI2PLogger()
 
 // AddChanges stages files matching the given pattern in the git repository.
 // If the repository doesn't exist or git operations fail, it logs and returns nil.

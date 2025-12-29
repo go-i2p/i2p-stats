@@ -1,7 +1,6 @@
 package stats
 
 import (
-	"log"
 	"net/netip"
 
 	"github.com/oschwald/geoip2-golang/v2"

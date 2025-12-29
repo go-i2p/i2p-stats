@@ -3,13 +3,15 @@ package site
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/go-i2p/i2p-stats/stats"
+	"github.com/go-i2p/logger"
 )
+
+var log = logger.GetGoI2PLogger()
 
 var header = `<!DOCTYPE html>
 <html>

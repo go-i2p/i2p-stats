@@ -9,7 +9,7 @@ import (
 	"github.com/go-i2p/logger"
 )
 
-var lgr = logger.GetGoI2PLogger()
+var log = logger.GetGoI2PLogger()
 
 // In this file we do deeper analysis of the DHT data than we can do with I2PControl alone.
 // We collect the RouterInfo entries from our local view of the DHT and analyze them.
@@ -47,17 +47,17 @@ func (db *DHT) routerInfos() (routerInfos []router_info.RouterInfo, err error) {
 	for path := range files {
 		riBytes, err := os.ReadFile(path)
 		if nil != err {
-			lgr.WithError(err).WithField("path", path).Error("Error reading RouterInfo file")
+			log.WithError(err).WithField("path", path).Error("Error reading RouterInfo file")
 			continue
 		}
 
 		riStruct, remainder, err := router_info.ReadRouterInfo(riBytes)
 		if err != nil {
-			lgr.WithError(err).WithField("path", path).Error("RouterInfo Parsing Error")
-			lgr.WithField("path", path).WithField("remainder", remainder).Debug("Leftover Data(for debugging)")
+			log.WithError(err).WithField("path", path).Error("RouterInfo Parsing Error")
+			log.WithField("path", path).WithField("remainder", remainder).Debug("Leftover Data(for debugging)")
 			continue
 		} else {
-			lgr.WithField("path", path).Debug("Successfully parsed RouterInfo")
+			log.WithField("path", path).Debug("Successfully parsed RouterInfo")
 		}
 
 		routerInfos = append(routerInfos, riStruct)
