@@ -210,11 +210,7 @@ func (db *DHT) CalculateAverageAddressEntropy() float64 {
 			continue
 		}
 		for _, addr := range addresses {
-			staticKey, err := addr.StaticKey()
-			if err != nil {
-				log.Error(err)
-				continue
-			}
+			staticKey := addr.StaticKeyString()
 			addrString := string(staticKey[0:])
 			entropy, err := entropy.Shannon(addrString)
 			if err != nil {
