@@ -51,14 +51,18 @@ type Stats struct {
 	ExploratoryBuildSucceededPercent int
 	ExploratoryBuildExpiredPercent   int
 	// DHT Statistics
-	DHTEnabled       bool
-	TotalRouters     int
-	IPv4Routers      int
-	IPv6Routers      int
-	FloodfillRouters int
-	ReachableRouters int
-	NTCP2Routers     int
-	SSU2Routers      int
+	DHTEnabled           bool
+	TotalRouters         int
+	IPv4Routers          int
+	IPv6Routers          int
+	FloodfillRouters     int
+	ReachableRouters     int
+	NTCP2Routers         int
+	SSU2Routers          int
+	MeanEntropy          float64
+	MeanAddressEntropy   float64
+	LowEntropyIdentities int
+	LowEntropyAddresses  int
 }
 
 func ErrStat() Stats {
@@ -122,7 +126,8 @@ func NewStats(dht *DHT) (Stats, error) {
 	log.Println("ExploratoryBuildExpiredPercent:", ExploratoryBuildExpiredPercent)
 
 	// Collect DHT statistics if provided
-	var totalRouters, ipv4Routers, ipv6Routers, floodfillRouters, reachableRouters, ntcp2Routers, ssu2Routers int
+	var totalRouters, ipv4Routers, ipv6Routers, floodfillRouters, reachableRouters, ntcp2Routers, ssu2Routers, lowEntropyCount, lowAddressEntropyCount int
+	var meanEntropy, meanAddressEntropy float64
 	dhtEnabled := false
 	if dht != nil {
 		dhtEnabled = true
@@ -133,6 +138,10 @@ func NewStats(dht *DHT) (Stats, error) {
 		reachableRouters = dht.CountReachableRouters()
 		ntcp2Routers = dht.CountNTCP2Routers()
 		ssu2Routers = dht.CountSSU2Routers()
+		meanEntropy = dht.CalculateAverageIdentityEntropy()
+		meanAddressEntropy = dht.CalculateAverageAddressEntropy()
+		lowEntropyCount = dht.CountLowEntropyIdentities()
+		lowAddressEntropyCount = dht.CountLowEntropyAddresses()
 		log.Println("DHT Total Routers:", totalRouters)
 		log.Println("DHT IPv4 Routers:", ipv4Routers)
 		log.Println("DHT IPv6 Routers:", ipv6Routers)
@@ -140,6 +149,10 @@ func NewStats(dht *DHT) (Stats, error) {
 		log.Println("DHT Reachable Routers:", reachableRouters)
 		log.Println("DHT NTCP2 Routers:", ntcp2Routers)
 		log.Println("DHT SSU2 Routers:", ssu2Routers)
+		log.Println("DHT Low Identity Entropy (< mean):", lowEntropyCount)
+		log.Println("DHT Mean Identity Entropy:", meanEntropy)
+		log.Println("DHT Low Address Entropy (< mean):", lowAddressEntropyCount)
+		log.Println("DHT Mean Address Entropy:", meanAddressEntropy)
 	}
 
 	return Stats{
@@ -158,6 +171,10 @@ func NewStats(dht *DHT) (Stats, error) {
 		ReachableRouters:                 reachableRouters,
 		NTCP2Routers:                     ntcp2Routers,
 		SSU2Routers:                      ssu2Routers,
+		MeanEntropy:                      meanEntropy,
+		MeanAddressEntropy:               meanAddressEntropy,
+		LowEntropyIdentities:             lowEntropyCount,
+		LowEntropyAddresses:              lowAddressEntropyCount,
 	}, nil
 }
 
@@ -208,14 +225,19 @@ func (s Stats) Markdown() string {
 
 	if s.DHTEnabled {
 		if s.TotalRouters > 0 {
-			markdown += fmt.Sprintf("\n#### DHT Network Statistics\n\n - Total Routers: %d\n - IPv4 Routers: %d\n - IPv6 Routers: %d\n - Floodfill Routers: %d\n - Reachable Routers: %d\n - NTCP2 Routers: %d\n - SSU2 Routers: %d\n",
+			markdown += fmt.Sprintf("\n#### DHT Network Statistics\n\n - Total Routers: %d\n - IPv4 Routers: %d\n - IPv6 Routers: %d\n - Floodfill Routers: %d\n - Reachable Routers: %d\n - NTCP2 Routers: %d\n - SSU2 Routers: %d\n - Mean Identity Entropy: %.2f\n - Mean Address Entropy: %.2f\n - Low Identity Entropy (< mean): %d\n - Low Address Entropy (< mean): %d\n",
 				s.TotalRouters,
 				s.IPv4Routers,
 				s.IPv6Routers,
 				s.FloodfillRouters,
 				s.ReachableRouters,
 				s.NTCP2Routers,
-				s.SSU2Routers)
+				s.SSU2Routers,
+				s.MeanEntropy,
+				s.MeanAddressEntropy,
+				s.LowEntropyIdentities,
+				s.LowEntropyAddresses,
+			)
 		} else {
 			markdown += "\n#### DHT Network Statistics\n\n - DHT collection enabled but no routers found in netDb\n"
 		}
