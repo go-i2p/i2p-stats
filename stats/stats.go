@@ -149,9 +149,9 @@ func NewStats(dht *DHT) (Stats, error) {
 		log.Println("DHT Reachable Routers:", reachableRouters)
 		log.Println("DHT NTCP2 Routers:", ntcp2Routers)
 		log.Println("DHT SSU2 Routers:", ssu2Routers)
-		log.Println("DHT Low Identity Entropy (< mean):", lowEntropyCount)
+		log.Println("DHT Low Identity Entropy (< 1/2 mean):", lowEntropyCount)
 		log.Println("DHT Mean Identity Entropy:", meanEntropy)
-		log.Println("DHT Low Address Entropy (< mean):", lowAddressEntropyCount)
+		log.Println("DHT Low Address Entropy (< 1/2 mean):", lowAddressEntropyCount)
 		log.Println("DHT Mean Address Entropy:", meanAddressEntropy)
 	}
 
