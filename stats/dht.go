@@ -172,3 +172,57 @@ func (db *DHT) CalculateAverageIdentityEntropy() float64 {
 	}
 	return totalEntropy / float64(count)
 }
+
+func (db *DHT) CountLowEntropyAddresses() int {
+	count := 0
+	thresh := db.CalculateAverageAddressEntropy()
+	for _, ri := range db.RouterInfos {
+		addresses := ri.RouterAddresses()
+		if addresses == nil {
+			continue
+		}
+		for _, addr := range addresses {
+			staticKey, err := addr.StaticKey()
+			if err != nil {
+				continue
+			}
+			addrString := string(staticKey[0:])
+			entropy, err := entropy.Shannon(addrString)
+			if err != nil {
+				continue
+			}
+			if entropy < thresh {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+func (db *DHT) CalculateAverageAddressEntropy() float64 {
+	totalEntropy := 0.0
+	count := 0
+	for _, ri := range db.RouterInfos {
+		addresses := ri.RouterAddresses()
+		if addresses == nil {
+			continue
+		}
+		for _, addr := range addresses {
+			staticKey, err := addr.StaticKey()
+			if err != nil {
+				continue
+			}
+			addrString := string(staticKey[0:])
+			entropy, err := entropy.Shannon(addrString)
+			if err != nil {
+				continue
+			}
+			totalEntropy += entropy
+			count++
+		}
+	}
+	if count == 0 {
+		return 0.0
+	}
+	return totalEntropy / float64(count)
+}
