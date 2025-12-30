@@ -63,6 +63,8 @@ type Stats struct {
 	MeanAddressEntropy   float64
 	LowEntropyIdentities int
 	LowEntropyAddresses  int
+	SignNotOnCurve       int
+	SuspiciousCrypto     int
 }
 
 func ErrStat() Stats {
@@ -126,7 +128,7 @@ func NewStats(dht *DHT) (Stats, error) {
 	log.Println("ExploratoryBuildExpiredPercent:", ExploratoryBuildExpiredPercent)
 
 	// Collect DHT statistics if provided
-	var totalRouters, ipv4Routers, ipv6Routers, floodfillRouters, reachableRouters, ntcp2Routers, ssu2Routers, lowEntropyCount, lowAddressEntropyCount int
+	var totalRouters, ipv4Routers, ipv6Routers, floodfillRouters, reachableRouters, ntcp2Routers, ssu2Routers, lowEntropyCount, lowAddressEntropyCount, notOnCurveCount, suspiciousCryptoCount int
 	var meanEntropy, meanAddressEntropy float64
 	dhtEnabled := false
 	if dht != nil {
@@ -142,6 +144,10 @@ func NewStats(dht *DHT) (Stats, error) {
 		meanAddressEntropy = dht.CalculateAverageAddressEntropy()
 		lowEntropyCount = dht.CountLowEntropyIdentities()
 		lowAddressEntropyCount = dht.CountLowEntropyAddresses()
+		notOnCurveCount = dht.CountSignaturesNotOnCurve()
+		suspiciousCryptoCount = dht.CountSuspiciousCrypto()
+
+		log.Println("DHT collection enabled, collected stats:")
 		log.Println("DHT Total Routers:", totalRouters)
 		log.Println("DHT IPv4 Routers:", ipv4Routers)
 		log.Println("DHT IPv6 Routers:", ipv6Routers)
@@ -153,6 +159,8 @@ func NewStats(dht *DHT) (Stats, error) {
 		log.Println("DHT Mean Identity Entropy:", meanEntropy)
 		log.Println("DHT Low Address Entropy (< 1/2 mean):", lowAddressEntropyCount)
 		log.Println("DHT Mean Address Entropy:", meanAddressEntropy)
+		log.Println("DHT Signatures Not On Curve:", notOnCurveCount)
+		log.Println("DHT Suspicious Crypto:", suspiciousCryptoCount)
 	}
 
 	return Stats{
@@ -175,6 +183,8 @@ func NewStats(dht *DHT) (Stats, error) {
 		MeanAddressEntropy:               meanAddressEntropy,
 		LowEntropyIdentities:             lowEntropyCount,
 		LowEntropyAddresses:              lowAddressEntropyCount,
+		SignNotOnCurve:                   notOnCurveCount,
+		SuspiciousCrypto:                 suspiciousCryptoCount,
 	}, nil
 }
 
@@ -225,7 +235,7 @@ func (s Stats) Markdown() string {
 
 	if s.DHTEnabled {
 		if s.TotalRouters > 0 {
-			markdown += fmt.Sprintf("\n#### DHT Network Statistics\n\n - Total Routers: %d\n - IPv4 Routers: %d\n - IPv6 Routers: %d\n - Floodfill Routers: %d\n - Reachable Routers: %d\n - NTCP2 Routers: %d\n - SSU2 Routers: %d\n - Mean Identity Entropy: %.2f\n - Mean Address Entropy: %.2f\n - Low Identity Entropy (< 1/2 mean): %d\n - Low Address Entropy (< 1/2 mean): %d\n",
+			markdown += fmt.Sprintf("\n#### DHT Network Statistics\n\n - Total Routers: %d\n - IPv4 Routers: %d\n - IPv6 Routers: %d\n - Floodfill Routers: %d\n - Reachable Routers: %d\n - NTCP2 Routers: %d\n - SSU2 Routers: %d\n - Mean Identity Entropy: %.2f\n - Mean Address Entropy: %.2f\n - Low Identity Entropy (< 1/2 mean): %d\n - Low Address Entropy (< 1/2 mean): %d\n - Signatures Not On Curve: %d\n - Suspicious Crypto: %d\n",
 				s.TotalRouters,
 				s.IPv4Routers,
 				s.IPv6Routers,
@@ -237,6 +247,8 @@ func (s Stats) Markdown() string {
 				s.MeanAddressEntropy,
 				s.LowEntropyIdentities,
 				s.LowEntropyAddresses,
+				s.SignNotOnCurve,
+				s.SuspiciousCrypto,
 			)
 		} else {
 			markdown += "\n#### DHT Network Statistics\n\n - DHT collection enabled but no routers found in netDb\n"

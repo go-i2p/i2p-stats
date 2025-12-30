@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/go-i2p/common/router_info"
+	"github.com/go-i2p/crypto/curve25519"
 	"github.com/go-i2p/crypto/ed25519"
 	"github.com/go-i2p/logger"
 	"github.com/lazybeaver/entropy"
@@ -242,14 +243,16 @@ func (db *DHT) CountSignaturesNotOnCurve() int {
 	return count
 }
 
-/*
 func (db *DHT) CountSuspiciousCrypto() int {
 	count := 0
 	for _, ri := range db.RouterInfos {
-		if !ri. {
+		identHash, err := ri.IdentHash()
+		if err != nil {
+			continue
+		}
+		if curve25519.IsValid(identHash[0:]) {
 			count++
 		}
 	}
 	return count
 }
-*/
