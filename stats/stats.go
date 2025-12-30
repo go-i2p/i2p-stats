@@ -225,7 +225,7 @@ func (s Stats) Markdown() string {
 
 	if s.DHTEnabled {
 		if s.TotalRouters > 0 {
-			markdown += fmt.Sprintf("\n#### DHT Network Statistics\n\n - Total Routers: %d\n - IPv4 Routers: %d\n - IPv6 Routers: %d\n - Floodfill Routers: %d\n - Reachable Routers: %d\n - NTCP2 Routers: %d\n - SSU2 Routers: %d\n - Mean Identity Entropy: %.2f\n - Mean Address Entropy: %.2f\n - Low Identity Entropy (< mean): %d\n - Low Address Entropy (< mean): %d\n",
+			markdown += fmt.Sprintf("\n#### DHT Network Statistics\n\n - Total Routers: %d\n - IPv4 Routers: %d\n - IPv6 Routers: %d\n - Floodfill Routers: %d\n - Reachable Routers: %d\n - NTCP2 Routers: %d\n - SSU2 Routers: %d\n - Mean Identity Entropy: %.2f\n - Mean Address Entropy: %.2f\n - Low Identity Entropy (< 1/2 mean): %d\n - Low Address Entropy (< 1/2 mean): %d\n",
 				s.TotalRouters,
 				s.IPv4Routers,
 				s.IPv6Routers,
