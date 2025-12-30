@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/go-i2p/common/router_info"
+	"github.com/go-i2p/crypto/ed25519"
 	"github.com/go-i2p/logger"
 	"github.com/lazybeaver/entropy"
 )
@@ -226,3 +227,29 @@ func (db *DHT) CalculateAverageAddressEntropy() float64 {
 	}
 	return totalEntropy / float64(count)
 }
+
+func (db *DHT) CountSignaturesNotOnCurve() int {
+	count := 0
+	for _, ri := range db.RouterInfos {
+		identHash, err := ri.IdentHash()
+		if err != nil {
+			continue
+		}
+		if !ed25519.IsOnCurve(identHash[0:]) {
+			count++
+		}
+	}
+	return count
+}
+
+/*
+func (db *DHT) CountSuspiciousCrypto() int {
+	count := 0
+	for _, ri := range db.RouterInfos {
+		if !ri. {
+			count++
+		}
+	}
+	return count
+}
+*/
