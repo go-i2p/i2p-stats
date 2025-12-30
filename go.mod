@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/go-git/go-git/v5 v5.16.4
-	github.com/go-i2p/common v0.1.1-0.20251230102010-55f179c84297
+	github.com/go-i2p/common v0.1.1-0.20251230104004-6436b35bfb9a
 	github.com/go-i2p/go-i2pcontrol v0.1.7
 	github.com/go-i2p/logger v0.1.0
 	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a

@@ -38,6 +38,8 @@ github.com/go-git/go-git/v5 v5.16.4 h1:7ajIEZHZJULcyJebDLo99bGgS0jRrOxzZG4uCk2Yb
 github.com/go-git/go-git/v5 v5.16.4/go.mod h1:4Ge4alE/5gPs30F2H1esi2gPd69R0C39lolkucHBOp8=
 github.com/go-i2p/common v0.1.1-0.20251230102010-55f179c84297 h1:Jx+hsIW7pKLtYtm80ShO+l4YRryrYb1nmgGutvYD/2Q=
 github.com/go-i2p/common v0.1.1-0.20251230102010-55f179c84297/go.mod h1:WsBjN4ST/PGj5pt9ecIXvoDHaiWHIUEb4mYZKCYa0Dc=
+github.com/go-i2p/common v0.1.1-0.20251230104004-6436b35bfb9a h1:WyS3cJEyUgWReG5sYRmu+XhwaE+eQthV5xg3/yxFbtU=
+github.com/go-i2p/common v0.1.1-0.20251230104004-6436b35bfb9a/go.mod h1:WsBjN4ST/PGj5pt9ecIXvoDHaiWHIUEb4mYZKCYa0Dc=
 github.com/go-i2p/crypto v0.1.1-0.20251212210701-124dadb97cb7 h1:6Oyo+a059Gc5/DX+F6oqbRhEh9O9u07bvnoRf5Iltqs=
 github.com/go-i2p/crypto v0.1.1-0.20251212210701-124dadb97cb7/go.mod h1:ayAu3sQu062OHtDYZv2smjlARfBQLdQHT8EtMu30ehg=
 github.com/go-i2p/elgamal v0.0.2 h1:3x2MwXWH5KjFZ06YThjLjB2/7eM3f6BsmhudKXn+dnk=
