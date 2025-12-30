@@ -36,8 +36,6 @@ github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399 h1:eMj
 github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399/go.mod h1:1OCfN199q1Jm3HZlxleg+Dw/mwps2Wbk9frAWm+4FII=
 github.com/go-git/go-git/v5 v5.16.4 h1:7ajIEZHZJULcyJebDLo99bGgS0jRrOxzZG4uCk2Yb2Y=
 github.com/go-git/go-git/v5 v5.16.4/go.mod h1:4Ge4alE/5gPs30F2H1esi2gPd69R0C39lolkucHBOp8=
-github.com/go-i2p/common v0.1.1-0.20251230102010-55f179c84297 h1:Jx+hsIW7pKLtYtm80ShO+l4YRryrYb1nmgGutvYD/2Q=
-github.com/go-i2p/common v0.1.1-0.20251230102010-55f179c84297/go.mod h1:WsBjN4ST/PGj5pt9ecIXvoDHaiWHIUEb4mYZKCYa0Dc=
 github.com/go-i2p/common v0.1.1-0.20251230104004-6436b35bfb9a h1:WyS3cJEyUgWReG5sYRmu+XhwaE+eQthV5xg3/yxFbtU=
 github.com/go-i2p/common v0.1.1-0.20251230104004-6436b35bfb9a/go.mod h1:WsBjN4ST/PGj5pt9ecIXvoDHaiWHIUEb4mYZKCYa0Dc=
 github.com/go-i2p/crypto v0.1.1-0.20251212210701-124dadb97cb7 h1:6Oyo+a059Gc5/DX+F6oqbRhEh9O9u07bvnoRf5Iltqs=
@@ -67,6 +65,8 @@ github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
+github.com/lazybeaver/entropy v0.0.0-20190817091901-99e00c014ccd h1:EMyTz+qUfiwuFNr3osFOEGOiVR4sqX0QS+VkXY87UOg=
+github.com/lazybeaver/entropy v0.0.0-20190817091901-99e00c014ccd/go.mod h1:obg/guZ8ckngQOYFaOBOsMriStaWb7c5qd9KVGLZCb4=
 github.com/oklog/ulid/v2 v2.1.1 h1:suPZ4ARWLOJLegGFiZZ1dFAkqzhMjL3J1TzI+5wHz8s=
 github.com/oklog/ulid/v2 v2.1.1/go.mod h1:rcEKHmBBKfef9DhnvX7y1HZBYxjXb0cP5ExxNsTT1QQ=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=

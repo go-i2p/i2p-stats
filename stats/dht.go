@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-i2p/common/router_info"
 	"github.com/go-i2p/logger"
+	"github.com/lazybeaver/entropy"
 )
 
 var log = logger.GetGoI2PLogger()
@@ -128,4 +129,45 @@ func (db *DHT) CountSSU2Routers() int {
 		}
 	}
 	return count
+}
+
+func (db *DHT) CountLowEntropyIdentities() int {
+	count := 0
+	for _, ri := range db.RouterInfos {
+		identHash, err := ri.IdentHash()
+		if err != nil {
+			continue
+		}
+		identHashString := string(identHash[0:])
+		entropy, err := entropy.Shannon(identHashString)
+		if err != nil {
+			continue
+		}
+		if entropy < 4.0 {
+			count++
+		}
+	}
+	return count
+}
+
+func (db *DHT) CalculateAverageIdentityEntropy() float64 {
+	totalEntropy := 0.0
+	count := 0
+	for _, ri := range db.RouterInfos {
+		identHash, err := ri.IdentHash()
+		if err != nil {
+			continue
+		}
+		identHashString := string(identHash[0:])
+		entropy, err := entropy.Shannon(identHashString)
+		if err != nil {
+			continue
+		}
+		totalEntropy += entropy
+		count++
+	}
+	if count == 0 {
+		return 0.0
+	}
+	return totalEntropy / float64(count)
 }

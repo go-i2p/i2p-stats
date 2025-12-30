@@ -8,6 +8,7 @@ require (
 	github.com/go-i2p/go-i2pcontrol v0.1.7
 	github.com/go-i2p/logger v0.1.0
 	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a
+	github.com/lazybeaver/entropy v0.0.0-20190817091901-99e00c014ccd
 	github.com/oschwald/geoip2-golang/v2 v2.1.0
 )
 
