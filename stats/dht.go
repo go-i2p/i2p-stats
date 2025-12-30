@@ -133,6 +133,7 @@ func (db *DHT) CountSSU2Routers() int {
 
 func (db *DHT) CountLowEntropyIdentities() int {
 	count := 0
+	thresh := db.CalculateAverageIdentityEntropy()
 	for _, ri := range db.RouterInfos {
 		identHash, err := ri.IdentHash()
 		if err != nil {
@@ -143,7 +144,7 @@ func (db *DHT) CountLowEntropyIdentities() int {
 		if err != nil {
 			continue
 		}
-		if entropy < 4.0 {
+		if entropy < thresh {
 			count++
 		}
 	}
