@@ -27,7 +27,7 @@ func NewGeoIP(dbPath string) (*GeoIP, error) {
 func (g *GeoIP) Lookup(ip string) (string, error) {
 	parsedIP, err := netip.ParseAddr(ip)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 	city, err := g.City(parsedIP)
 	if err != nil {
