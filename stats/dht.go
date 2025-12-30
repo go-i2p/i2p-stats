@@ -184,11 +184,13 @@ func (db *DHT) CountLowEntropyAddresses() int {
 		for _, addr := range addresses {
 			staticKey, err := addr.StaticKey()
 			if err != nil {
+				log.Error(err)
 				continue
 			}
 			addrString := string(staticKey[0:])
 			entropy, err := entropy.Shannon(addrString)
 			if err != nil {
+				log.Error(err)
 				continue
 			}
 			if entropy < thresh {
@@ -210,11 +212,13 @@ func (db *DHT) CalculateAverageAddressEntropy() float64 {
 		for _, addr := range addresses {
 			staticKey, err := addr.StaticKey()
 			if err != nil {
+				log.Error(err)
 				continue
 			}
 			addrString := string(staticKey[0:])
 			entropy, err := entropy.Shannon(addrString)
 			if err != nil {
+				log.Error(err)
 				continue
 			}
 			totalEntropy += entropy
