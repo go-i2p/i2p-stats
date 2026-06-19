@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="{{.RefreshSeconds}}">
+<title>I2P Router Stats</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>I2P Router Stats</h1>
+  {{with .Stats}}
+  {{if .Unhealthy}}
+  <div class="banner banner-warn" role="status">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+    <span>
+      Stale data — router unreachable. Last update:
+      {{if .LastUpdated.IsZero}}never{{else}}{{.LastUpdated.Format "2006-01-02 15:04:05 MST"}}{{end}}.
+      (Reason: {{.StaleReason}})
+    </span>
+  </div>
+  {{end}}
+  {{end}}
+</header>
+<main>
+  {{template "index.html" .}}
+</main>
+<footer>
+  {{with .Stats}}
+  <p>
+    {{if .LastUpdated.IsZero}}Awaiting first refresh…{{else}}
+    Updated: {{.LastUpdated.Format "15:04:05 MST"}}
+    {{end}}
+  </p>
+  {{end}}
+  <p><a href="/">Refresh now</a></p>
+</footer>
+</body>
+</html>

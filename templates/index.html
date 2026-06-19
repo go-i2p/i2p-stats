@@ -1,0 +1,49 @@
+{{define "index.html"}}
+{{with .Stats}}
+<section aria-labelledby="router-h">
+  <h2 id="router-h">Router Status</h2>
+  <dl>
+    <dt>Version</dt><dd>{{or .Version "—"}}</dd>
+    <dt>Uptime</dt><dd>{{or .Uptime "—"}}</dd>
+    <dt>Status</dt><dd>{{or .Status "—"}}</dd>
+    <dt>Network</dt><dd>{{or .NetworkStatus "—"}}</dd>
+  </dl>
+</section>
+
+<section aria-labelledby="bw-h">
+  <h2 id="bw-h">Bandwidth</h2>
+  <dl>
+    <dt>Outbound</dt><dd>{{or .SendRate "—"}}</dd>
+    <dt>Inbound</dt><dd>{{or .RecvRate "—"}}</dd>
+  </dl>
+</section>
+
+<section aria-labelledby="peers-h">
+  <h2 id="peers-h">Peers</h2>
+  <dl>
+    <dt>Active</dt><dd>{{or .ActivePeers "—"}}</dd>
+    <dt>NetDB Active</dt><dd>{{or .NetDBActivePeers "—"}}</dd>
+    <dt>Fast</dt><dd>{{or .FastPeers "—"}}</dd>
+    <dt>High Capacity</dt><dd>{{or .HighCapacityPeers "—"}}</dd>
+  </dl>
+</section>
+
+<section aria-labelledby="tun-h">
+  <h2 id="tun-h">Tunnels</h2>
+  <dl>
+    <dt>Participating</dt><dd>{{or .ParticipatingTunnels "—"}}</dd>
+    <dt>Build Success</dt><dd>{{or .BuildSuccess "—"}}</dd>
+    <dt>Build Failure</dt><dd>{{or .BuildFailure "—"}}</dd>
+  </dl>
+</section>
+
+<section aria-labelledby="perf-h">
+  <h2 id="perf-h">Performance</h2>
+  <dl>
+    <dt>Send Ack Time</dt><dd>{{or .SendAckTime "—"}}</dd>
+    <dt>Job Lag</dt><dd>{{or .JobLag "—"}}</dd>
+    <dt>Transport Send</dt><dd>{{or .TransportSendProcessing "—"}}</dd>
+  </dl>
+</section>
+{{end}}
+{{end}}

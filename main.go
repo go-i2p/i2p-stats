@@ -1,121 +1,128 @@
+// i2pstats — JS-free I2P router stats dashboard exposed as a SAM hidden service.
+//
+// Third-party libraries (see THIRD_PARTY_LICENSES.md):
+//   - github.com/go-i2p/onramp                  (MIT)
+//   - github.com/go-i2p/go-i2pcontrol           (MIT)
+//   - golang.org/x/sync/singleflight            (BSD-3-Clause)
 package main
 
 import (
-	"flag"
+	"context"
+	"embed"
+	"errors"
+	"io/fs"
+	"log/slog"
+	"net"
+	"net/http"
 	"os"
-	"path/filepath"
+	"os/signal"
+	"syscall"
+	"time"
 
-	"github.com/go-i2p/i2p-stats/git"
-	"github.com/go-i2p/i2p-stats/site"
-	"github.com/go-i2p/i2p-stats/stats"
-	"github.com/go-i2p/logger"
+	"github.com/go-i2p/i2p-stats/pkg/cache"
+	"github.com/go-i2p/i2p-stats/pkg/client"
+	"github.com/go-i2p/i2p-stats/pkg/handlers"
+	"github.com/go-i2p/i2p-stats/pkg/listener"
 )
 
-var log = logger.GetGoI2PLogger()
-
-var Docroot = docroot
-
-func docroot() string {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal(err)
-	}
-	i2p := filepath.Join(home, ".i2p")
-	eepsite := filepath.Join(i2p, "eepsite")
-	docroot := filepath.Join(eepsite, "docroot")
-	weather := filepath.Join(docroot, "weather")
-	os.MkdirAll(weather, 0o755)
-	return weather
-}
-
-func netdbroot() string {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal(err)
-	}
-	i2p := filepath.Join(home, ".i2p")
-	netdb := filepath.Join(i2p, "netDb")
-	return netdb
-}
-
-// Get the user's home directory.
-// Build the path to the i2p directory inside the home directory.
-// Build the path to the eepsite directory inside the i2p directory.
-// Build the path to the docroot directory inside the eepsite directory.
-// Return the docroot path.
-
-var (
-	runDir       = flag.String("dir", Docroot(), "directory to run from")
-	templatesDir = flag.String("templates", "./templates", "directory containing templates")
-	noGit        = flag.Bool("no-git", false, "skip git operations")
-	dhtDir       = flag.String("dht", netdbroot(), "directory containing DHT RouterInfo files")
-	geoipDB      = flag.String("geoip", "", "path to MaxMind GeoIP2 database file")
-)
+//go:embed templates static
+var assets embed.FS
 
 func main() {
-	flag.Parse()
-	os.Chdir(*runDir)
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
-	// Initialize template manager
-	templateManager, err := site.NewTemplateManager(*templatesDir)
+	cfg := loadConfig()
+	logger.Info("starting i2pstats",
+		"sam", cfg.SAMAddr,
+		"i2pcontrol", cfg.I2PControlEndpoint,
+		"tunnel", cfg.TunnelName,
+		"refresh", cfg.RefreshInterval,
+	)
+
+	// --- I2PControl client ---
+	rc := client.New(client.Config{
+		Endpoint: cfg.I2PControlEndpoint,
+		Password: cfg.I2PControlPassword,
+		Timeout:  3 * time.Second,
+	})
+	defer rc.Close()
+
+	// --- Stats cache ---
+	cacheCtx, cancelCache := context.WithCancel(context.Background())
+	defer cancelCache()
+	statsCache := cache.New(rc, cfg.RefreshInterval, logger)
+	go statsCache.Run(cacheCtx)
+
+	// --- Handlers ---
+	h, err := handlers.New(statsCache, assets, logger, cfg.RefreshInterval)
 	if err != nil {
-		log.Printf("Warning: Template initialization failed: %v. Falling back to hardcoded templates.", err)
-		templateManager = site.NewDisabledTemplateManager()
+		logger.Error("handler init", "err", err)
+		os.Exit(1)
 	}
 
-	// Set template manager for stats package
-	stats.SetTemplateManager(templateManager)
+	staticFS, err := fs.Sub(assets, "static")
+	if err != nil {
+		logger.Error("static FS", "err", err)
+		os.Exit(1)
+	}
 
-	// Initialize DHT if directory provided
-	var dht *stats.DHT
-	if *dhtDir != "" {
-		log.Println("Initializing DHT analysis from:", *dhtDir)
-		d, err := stats.NewDHT(*dhtDir)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", h.Index)
+	mux.HandleFunc("/healthz", h.Health)
+	mux.Handle("/static/",
+		http.StripPrefix("/static/",
+			cacheControl(http.FileServer(http.FS(staticFS)), "public, max-age=86400"),
+		))
+
+	// --- Hidden service listener (no TCP bind ever) ---
+	garlic, ln, err := listener.New(listener.Config{
+		TunnelName: cfg.TunnelName,
+		SAMAddr:    cfg.SAMAddr,
+		KeyDir:     cfg.KeyDir,
+	})
+	if err != nil {
+		logger.Error("hidden service init", "err", err)
+		os.Exit(1)
+	}
+	logger.Info("hidden service ready", "b32", garlic.B32())
+
+	// --- HTTP server ---
+	var serverLn net.Listener = ln
+	srv := &http.Server{
+		Handler:           gzipMiddleware(mux),
+		ReadHeaderTimeout: 5 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
+
+	// --- Signal-driven graceful shutdown ---
+	rootCtx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	serveErr := make(chan error, 1)
+	go func() {
+		if err := srv.Serve(serverLn); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			serveErr <- err
+		}
+		close(serveErr)
+	}()
+
+	select {
+	case <-rootCtx.Done():
+		logger.Info("shutdown signal received")
+	case err := <-serveErr:
 		if err != nil {
-			log.Printf("Warning: DHT initialization failed: %v", err)
-		} else {
-			dht = &d
+			logger.Error("http serve", "err", err)
 		}
 	}
 
-	// Initialize GeoIP if database provided
-	var geoip *stats.GeoIP
-	if *geoipDB != "" {
-		log.Println("Initializing GeoIP from:", *geoipDB)
-		g, err := stats.NewGeoIP(*geoipDB)
-		if err != nil {
-			log.Printf("Warning: GeoIP initialization failed: %v", err)
-		} else {
-			geoip = g
-			defer geoip.Close()
-		}
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		logger.Warn("server shutdown", "err", err)
 	}
-
-	if statsite, err := site.NewStatsSite(*runDir, templateManager, dht); err != nil {
-		log.Fatal(err)
-	} else {
-		// Generate HTML output
-		if err := statsite.OutputPages(); err != nil {
-			log.Fatal(err)
-		}
-		if err := statsite.GenerateIndexPages(); err != nil {
-			log.Fatal(err)
-		}
-		if err := statsite.OutputHomePage(); err != nil {
-			log.Fatal(err)
-		}
-		// Generate Markdown output
-		if err := statsite.OutputMarkdownPages(); err != nil {
-			log.Fatal(err)
-		}
-		if err := statsite.OutputMarkdownHomePage(); err != nil {
-			log.Fatal(err)
-		}
-		if err := statsite.GenerateMarkdownIndexPages(); err != nil {
-			log.Fatal(err)
-		}
-		if !*noGit {
-			git.AddChanges(*runDir, statsite.StatsDirectory)
-		}
+	if err := garlic.Close(); err != nil {
+		logger.Warn("garlic close", "err", err)
 	}
+	logger.Info("bye")
 }
