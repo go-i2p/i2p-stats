@@ -22,7 +22,7 @@ require (
 	github.com/go-i2p/go-datagrams v0.1.59999 // indirect
 	github.com/go-i2p/go-i2cp v0.1.60000-0.20260612013604-6be0e753d2c7 // indirect
 	github.com/go-i2p/go-i2p v0.1.59999 // indirect
-	github.com/go-i2p/go-nat-listener v0.0.0-20260402222111-bfda0025cb1b // indirect
+	github.com/go-i2p/go-nat-listener v0.1.62 // indirect
 	github.com/go-i2p/go-noise v0.1.60000-0.20260624210455-c5cd198c4109 // indirect
 	github.com/go-i2p/go-sam-bridge v0.1.59999 // indirect
 	github.com/go-i2p/go-sam-go v0.33.1 // indirect
@@ -54,7 +54,7 @@ require (
 	github.com/ybbus/jsonrpc/v2 v2.1.7 // indirect
 	go.opentelemetry.io/otel v1.44.0 // indirect
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
-	go.step.sm/crypto v0.84.0 // indirect
+	go.step.sm/crypto v0.84.1 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.53.0 // indirect
 	golang.org/x/net v0.56.0 // indirect

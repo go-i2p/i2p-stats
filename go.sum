@@ -35,6 +35,8 @@ github.com/go-i2p/go-i2pcontrol v0.1.9-0.20260607233455-950087a3858f h1:FJJXgN8/
 github.com/go-i2p/go-i2pcontrol v0.1.9-0.20260607233455-950087a3858f/go.mod h1:+jmWmXsfpg9fVmNmaLFCykYyxkYphdrLRD54UwNw2Qs=
 github.com/go-i2p/go-nat-listener v0.0.0-20260402222111-bfda0025cb1b h1:KzL/bql7UATLCsfk+kgam19kWuEe34/ia3A1uE0CFE0=
 github.com/go-i2p/go-nat-listener v0.0.0-20260402222111-bfda0025cb1b/go.mod h1:hd95uOrwhTa2coFcJkBlGwGgOpjVNVYkAXxRvwIJRsE=
+github.com/go-i2p/go-nat-listener v0.1.62 h1:zdk8blH5yXydYlppq6NX/y0H803B3iJkcMp1nNebGiM=
+github.com/go-i2p/go-nat-listener v0.1.62/go.mod h1:grAvt54cQEIfhOH4xwTGSWHgXtUyf0co9HlWDccj64E=
 github.com/go-i2p/go-noise v0.1.60000-0.20260624210455-c5cd198c4109 h1:zngXLgp2SbDFurRyOzvcl/FGz4Tiv8lukMq29FcVeRI=
 github.com/go-i2p/go-noise v0.1.60000-0.20260624210455-c5cd198c4109/go.mod h1:c2Jt/1Hw5PQ4jipRO1THLlaQ4sc1DeOLdOFvR1Hnmo8=
 github.com/go-i2p/go-sam-bridge v0.1.59999 h1:ghVTX4H6AHx8+39UuBhYDjq71Gtftkp4kHQKsf1K47g=
@@ -122,6 +124,8 @@ go.opentelemetry.io/otel/trace v1.44.0 h1:jxF5CsGYCe74MCRx2X4g7WsY/VBKRqqpNvXlX/
 go.opentelemetry.io/otel/trace v1.44.0/go.mod h1:oLl1jrMQAVo6v3GAggN+1VH9VIz9iUSvW53sW1Q8PIE=
 go.step.sm/crypto v0.84.0 h1:A9YPNNNGG1p1JKmaSX8XiYOisoOumHlIrPIv4wwTZSU=
 go.step.sm/crypto v0.84.0/go.mod h1:T54MIdw42uZnz3+mjOIOpJbsbTZF+O3IOLhvU9lBoJk=
+go.step.sm/crypto v0.84.1 h1:i0JNkcLT7LcXef00TNpckjoTTH0QP6REHcAvnY3qrNY=
+go.step.sm/crypto v0.84.1/go.mod h1:T54MIdw42uZnz3+mjOIOpJbsbTZF+O3IOLhvU9lBoJk=
 go.yaml.in/yaml/v3 v3.0.4 h1:tfq32ie2Jv2UxXFdLJdh3jXuOzWiL1fo0bu/FbuKpbc=
 go.yaml.in/yaml/v3 v3.0.4/go.mod h1:DhzuOOF2ATzADvBadXxruRBLzYTpT36CKvDb3+aBEFg=
 golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a/go.mod h1:P+XmwS30IXTQdn5tA2iutPOUgjI07+tq3H3K9MVA1s8=
